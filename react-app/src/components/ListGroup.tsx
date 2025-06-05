@@ -1,38 +1,45 @@
 import React, { useState } from "react";
 import { MouseEvent } from "react";
-function ListGroup() {
-  let items = ["tartous", "syria"];
-  const [Active, setActive] = useState(-1);
+// import styles from "./ListGroup.module.css";
+import styled from "styled-components";
+interface ListGroupProps {
+  items: String[];
+  heading: String;
+  onSelectItem: (item: String) => void;
+}
+
+function ListGroup(props: ListGroupProps) {
+  const [Active, setActive] = useState(0);
   const handleClick = (i: String, index: number, event: MouseEvent) => {
-    // console.log(i, index, event.pageX);
+    props.onSelectItem(i);
     setActive(index);
   };
 
-  //   hook
-
+  const LList = styled.ul`
+    list-style: none;
+    padding: 0;
+    color: red;
+    background-color: red;
+  `;
+  const ListItem = styled.li`
+    color: red;
+  `;
   return (
     <>
-      <h1>List header </h1>
-      {items.length !== 0 ? (
-        <ul className="list-group">
-          {items.map((item, index) => {
-            console.log(index);
-            console.log(Active);
+      <h1>{props.heading}</h1>
+      {props.items.length !== 0 ? (
+        <LList>
+          {props.items.map((item, index) => {
             return (
-              <li
+              <ListItem
                 onClick={(event) => handleClick(item, index, event)}
-                key={item}
-                className={
-                  Active === index
-                    ? "list-group-item acitve"
-                    : "list-group-item"
-                }
+                key={index}
               >
                 {item}
-              </li>
+              </ListItem>
             );
           })}
-        </ul>
+        </LList>
       ) : (
         <p>no container</p>
       )}
