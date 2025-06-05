@@ -17,12 +17,24 @@ function ListGroup(props: ListGroupProps) {
 
   const LList = styled.ul`
     list-style: none;
-    padding: 0;
-    color: red;
-    background-color: red;
+    padding: 12px;
+    color: green;
+    background-color: blue;
+    margin: 12px;
+    border-radius: 40px;
   `;
-  const ListItem = styled.li`
-    color: red;
+  interface ListItemProps {
+    active: Boolean;
+  }
+  const ListItem = styled.li<ListItemProps>`
+    color: ${(props) => (props.active ? "green" : "blue")};
+    background-color: ${(props) => (props.active ? "red" : "blue")};
+    font-size: 2rem;
+    margin: 12px;
+    padding: 12px;
+    border-radius: 40px;
+    border: 2px solid green;
+    align-item: center;
   `;
   return (
     <>
@@ -32,7 +44,8 @@ function ListGroup(props: ListGroupProps) {
           {props.items.map((item, index) => {
             return (
               <ListItem
-                onClick={(event) => handleClick(item, index, event)}
+                active={index === Active}
+                onClick={(event) => setActive(index)}
                 key={index}
               >
                 {item}
