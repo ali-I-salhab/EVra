@@ -11,6 +11,10 @@ import NavBar from "./components/NavBar";
 import Cart from "./components/Cart";
 import "bootstrap/dist/css/bootstrap.css";
 import Form from "./components/Form";
+import ExpenseFilter from "./../expense-tracker/components/ExpenseFilter";
+import ExpenseList from "./../expense-tracker/components/ExpenseList";
+import ExpenseForm from "./../expense-tracker/components/ExpenseForm";
+
 function App() {
   const [showingState, onShowingState] = useState(false);
   const [cartItems, setCartItems] = useState(["product1 ", "product2"]);
@@ -22,9 +26,42 @@ function App() {
     const a = [...cartItems, `product${cartItems.length + 1}`];
     setCartItems(a);
   };
+  const [expenses, setExpenses] = useState([
+    { id: 1, description: "all description ", amount: 23, category: "tar" },
+    { id: 2, description: "all description ", amount: 2, category: "lat" },
+    { id: 3, description: "all description ", amount: 3, category: "hom" },
+    { id: 4, description: "all description ", amount: 3, category: "dam" },
+  ]);
+  const [selectedCategory, SetSelectedCategory] = useState("");
+  const visiblesxpense = selectedCategory
+    ? expenses.filter((e) => {
+        return e.category === selectedCategory;
+      })
+    : expenses;
   return (
     <div>
-      <Form />
+      <ExpenseForm
+        onSubmit={(data) => {
+          console.log(data);
+          // console.log("---------------");
+
+          setExpenses([{ ...data, id: expenses.length + 1 }, ...expenses]);
+        }}
+      />
+      <div className="mb-3">
+        <ExpenseFilter
+          onFilter={function (cat: String): void {
+            SetSelectedCategory(cat.toString());
+          }}
+        />
+      </div>
+      <ExpenseList
+        expenses={visiblesxpense}
+        onDelete={function (id: number): void {
+          console.log(id);
+          setExpenses(expenses.filter((e) => e.id != id));
+        }}
+      />
     </div>
     // <div>
     //   <NavBar cartItemsCount={cartItems.length} />
