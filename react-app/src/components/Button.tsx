@@ -1,4 +1,5 @@
 import React from "react";
+import styles from "./Button.module.css";
 interface ButtonProps {
   text: String;
   color?: "primary" | "secondary" | "danger";
@@ -10,7 +11,7 @@ function Button({ color = "primary", text, onClick }: ButtonProps) {
     <button
       type="button"
       onClick={() => onClick(classname)}
-      className={classname}
+      className={[styles.btn, styles["btn-primary"]].join(" ")}
     >
       {text}
     </button>

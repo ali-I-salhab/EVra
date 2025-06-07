@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { MouseEvent } from "react";
 // import styles from "./ListGroup.module.css";
 import styled from "styled-components";
+import { AiFillAccountBook } from "react-icons/ai";
+import { AiFillAlert } from "react-icons/ai";
+
 interface ListGroupProps {
   items: String[];
   heading: String;
@@ -38,6 +41,8 @@ function ListGroup(props: ListGroupProps) {
   `;
   return (
     <>
+      <AiFillAccountBook size="60" color={Active ? "green" : "red"} />
+      <AiFillAlert size="60" color="red" />
       <h1>{props.heading}</h1>
       {props.items.length !== 0 ? (
         <LList>
