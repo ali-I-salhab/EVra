@@ -14,10 +14,11 @@ import Form from "./components/Form";
 import ExpenseFilter from "./../expense-tracker/components/ExpenseFilter";
 import ExpenseList from "./../expense-tracker/components/ExpenseList";
 import ExpenseForm from "./../expense-tracker/components/ExpenseForm";
-import axios from "axios";
 import TestData from "./../Backend-services/TestData";
 import ProductList from "../Backend-services/ProductList";
-
+import UserService, { User } from "./../Backend-services/services/userService";
+import { CanceledError } from "./../Backend-services/services/api-client";
+import userService from "./../Backend-services/services/userService";
 function App() {
   const [showingState, onShowingState] = useState(false);
   const [cartItems, setCartItems] = useState(["product1 ", "product2"]);
@@ -43,37 +44,100 @@ function App() {
     : expenses;
   const [category, setCategory] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [users, Setusers] = useState<User[]>([]);
-  interface User {
-    id: number;
-    name: String;
-  }
+
   useEffect(() => {
-    axios
-      .get<User[]>("https://jsonplaceholder.typicode.com/users")
+    setLoading(true);
+    const { request, cancel } = UserService.getAllUsers();
+
+    request
       .then((res) => {
         Setusers(res.data);
+        setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
+        if (err instanceof CanceledError) return;
         setError(err.message);
+        setLoading(false);
       });
+    return () => cancel();
   }, []);
+  const deleteUser = (user: User) => {
+    const orgiginalUsers = [...users];
+    Setusers(
+      users.filter((e) => {
+        return user.id !== e.id;
+      })
+    );
+    userService.deleteUser(user.id).catch((error) => {
+      setError(error.message);
+      Setusers(orgiginalUsers);
+    });
+  };
+
+  const adduser = () => {
+    const originalUsers = [...users];
+    console.log("add new user ");
+
+    const newUser = { id: 0, name: "ali", email: "as" };
+    Setusers([newUser, ...users]);
+    userService
+      .adduser(newUser)
+      .then((res) => Setusers([res.data, ...users]))
+      .catch((err) => {
+        setError(err.message);
+        Setusers(originalUsers);
+      });
+  };
+  const updateUser = (user: User) => {
+    console.log(user);
+    const originalUsers = [...users];
+    const updatedUser = { ...user, name: "ali salhab" };
+    Setusers(
+      users.map((e) => {
+        return e.id === user.id ? updatedUser : e;
+      })
+    );
+
+    userService.updateUser(updatedUser).catch((err) => {
+      setError(err.message);
+      Setusers(originalUsers);
+    });
+  };
   return (
     <>
+      <button onClick={adduser} className="btn btn-primary">
+        {" "}
+        add new
+      </button>
+      {loading && <div className="spinner-border text-danger"></div>}
       {error || (
         <ul className="list-group">
           {users.map((user) => {
             return (
               <li
                 key={user.id}
-                className="list-group-item list-group-item-primary"
+                className="list-group-item list-group-item-primary d-flex justify-content-between"
               >
-                {user.name} {user.id}
-                <button className="btn btn-outline-danger mx-3 my-2">
+                {user.name} {user.email}
+                <div>
                   {" "}
-                  delete
-                </button>
+                  <button
+                    className="btn btn-outline-danger mx-3 my-2"
+                    onClick={() => deleteUser(user)}
+                  >
+                    {" "}
+                    delete
+                  </button>
+                  <button
+                    className="btn btn-outline-primary mx-3 my-2"
+                    onClick={() => updateUser(user)}
+                  >
+                    {" "}
+                    update
+                  </button>
+                </div>
               </li>
             );
           })}
